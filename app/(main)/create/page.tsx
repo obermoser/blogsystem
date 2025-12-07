@@ -1,4 +1,5 @@
 'use client';
+import { createPostAction } from '@/app/actions';
 import { postSchema } from '@/app/schemas/blog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,14 +18,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import z from 'zod';
 
 const Create = () => {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const create = useMutation(api.posts.createPost);
   const form = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
@@ -34,8 +34,8 @@ const Create = () => {
     },
   });
 
-  const handleSubmit = async (data: z.infer<typeof postSchema>) => {
-    setIsPending(true);
+  const handleSubmit = (data: z.infer<typeof postSchema>) => {
+    /* setIsPending(true);
 
     const promise = create({
       title: data.title,
@@ -53,7 +53,10 @@ const Create = () => {
     } finally {
       setIsPending(false);
       router.push('/');
-    }
+    } */
+    startTransition(async () => {
+      await createPostAction(data);
+    });
   };
 
   return (
