@@ -21,6 +21,11 @@ export const createAuth = (
     logger: {
       disabled: optionsOnly,
     },
+    rateLimit: {
+      window: 10, // time window in seconds
+      max: 100, // max requests in the window
+      storage: 'database',
+    },
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started

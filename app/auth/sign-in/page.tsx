@@ -23,6 +23,7 @@ import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -30,6 +31,7 @@ import z from 'zod';
 
 export default function SingIn() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -48,6 +50,7 @@ export default function SingIn() {
         fetchOptions: {
           onSuccess: () => {
             toast.success('Signed in successfully');
+            router.push('/');
           },
           onError: (error) => {
             toast.error(error.error.message);

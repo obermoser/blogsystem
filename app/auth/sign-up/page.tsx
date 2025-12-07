@@ -23,6 +23,7 @@ import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -41,6 +42,8 @@ export default function SignUp() {
   });
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
+    const router = useRouter();
+
     setIsLoading(true);
     await authClient.signUp
       .email({
@@ -50,6 +53,7 @@ export default function SignUp() {
         fetchOptions: {
           onSuccess: () => {
             toast.success('Signed up successfully');
+            router.push('/');
           },
           onError: (error) => {
             toast.error(error.error.message);
