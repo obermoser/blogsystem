@@ -13,9 +13,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/convex/_generated/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from 'convex/react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
@@ -25,7 +23,6 @@ import z from 'zod';
 const Create = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const create = useMutation(api.posts.createPost);
   const form = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
     defaultValues: {
