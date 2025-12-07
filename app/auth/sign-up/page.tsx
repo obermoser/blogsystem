@@ -2,7 +2,14 @@
 
 import { signUpSchema } from '@/app/schemas/auth';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -12,11 +19,18 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
 
 export default function SignUp() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -26,8 +40,23 @@ export default function SignUp() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof signUpSchema>) {
-    console.log(values);
+  async function onSubmit(data: z.infer<typeof signUpSchema>) {
+    setIsLoading(true);
+    await authClient.signUp
+      .email({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success('Signed up successfully');
+          },
+          onError: (error) => {
+            toast.error(error.error.message);
+          },
+        },
+      })
+      .finally(() => setIsLoading(false));
   }
 
   return (
@@ -39,49 +68,63 @@ export default function SignUp() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Sign up</Button>
+            <div className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button disabled={isLoading} type="submit">
+                {isLoading ? <Loader2 className="animate-spin" /> : <p>Sign Up</p>}
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>
+      <CardFooter>
+        <div className="text-sm text-muted-foreground flex items-center justify-center text-center w-full">
+          Have an account already?{' '}
+          <Button asChild variant="link">
+            <Link href="/auth/sign-in" prefetch>
+              Sign In
+            </Link>
+          </Button>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
