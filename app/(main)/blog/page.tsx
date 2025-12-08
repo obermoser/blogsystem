@@ -33,7 +33,7 @@ async function LoadBLogList() {
         <Card key={post._id} className="pt-0">
           <div className="relative h-48 w-full overflow-hidden">
             <Image
-              className="rounded-t-lg"
+              className="rounded-t-lg object-cover"
               src={
                 post.imageUrl ??
                 'https://images.unsplash.com/photo-1764082497081-a023b72c9239?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
