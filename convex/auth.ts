@@ -3,7 +3,6 @@ import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { components } from '../convex/_generated/api';
 import { DataModel } from '../convex/_generated/dataModel';
-import { query } from '../convex/_generated/server';
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -26,6 +25,7 @@ export const createAuth = (
       max: 100, // max requests in the window
       storage: 'database',
     },
+    trustedOrigins: ['https://nextjs-16-blog.vercel.app', 'http:localhost:3000'],
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
@@ -39,12 +39,3 @@ export const createAuth = (
     ],
   });
 };
-
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
-  },
-});
