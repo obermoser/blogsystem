@@ -28,6 +28,7 @@ const Create = () => {
     defaultValues: {
       title: '',
       content: '',
+      image: undefined,
     },
   });
 
@@ -98,6 +99,28 @@ const Create = () => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <Button disabled={isPending} type="submit">
                   {isPending ? <Loader2 className="size-4 animate-spin" /> : <p>Create</p>}
                 </Button>
