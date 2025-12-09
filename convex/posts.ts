@@ -1,6 +1,20 @@
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 
+export const getById = query({
+  args: { postId: v.id('posts') },
+  handler: async (ctx, { postId }) => {
+    const post = await ctx.db.get(postId);
+    const resolvedImageUrl =
+      post?.imageStorageId !== undefined ? await ctx.storage.getUrl(post.imageStorageId) : null;
+
+    return {
+      ...post,
+      imageUrl: resolvedImageUrl,
+    };
+  },
+});
+
 export const get = query({
   args: {},
   handler: async (ctx) => {
