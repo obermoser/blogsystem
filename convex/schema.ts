@@ -8,4 +8,13 @@ export default defineSchema({
     authorId: v.string(),
     imageStorageId: v.optional(v.id('_storage')),
   }).index('by_authorId', ['authorId']),
+
+  comments: defineTable({
+    postId: v.id('posts'),
+    authorId: v.string(),
+    authorName: v.string(),
+    body: v.string(),
+  })
+    .index('by_postingId', ['postId'])
+    .index('by_authorId', ['authorId']),
 });
