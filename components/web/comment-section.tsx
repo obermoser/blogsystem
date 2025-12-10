@@ -4,7 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AvatarFallback } from '@radix-ui/react-avatar';
-import { useMutation, useQuery } from 'convex/react';
+import { Preloaded, useMutation, usePreloadedQuery } from 'convex/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2, MessageSquare } from 'lucide-react';
 import { useParams } from 'next/navigation';
@@ -19,11 +19,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 
-export function CommentSection() {
+interface CommentSectionProps {
+  preloadedComments: Preloaded<typeof api.comments.getCommentsByPost>;
+}
+
+export function CommentSection({ preloadedComments }: CommentSectionProps) {
   const [isPending, startTransition] = useTransition();
   const params = useParams<{ postId: Id<'posts'> }>();
   const createComment = useMutation(api.comments.create);
-  const data = useQuery(api.comments.getCommentsByPost, { postingId: params.postId });
+  const data = usePreloadedQuery(preloadedComments);
 
   const form = useForm<z.infer<typeof commentSchema>>({
     resolver: zodResolver(commentSchema),

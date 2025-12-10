@@ -3,7 +3,7 @@ import { Separator } from '@/components/ui/separator';
 import { CommentSection } from '@/components/web/comment-section';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { fetchQuery } from 'convex/nextjs';
+import { fetchQuery, preloadQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
@@ -15,7 +15,13 @@ interface PostIdProps {
 
 const PostIdPage = async ({ params }: PostIdProps) => {
   const { postId } = await params;
-  const data = await fetchQuery(api.posts.getById, { postId: postId });
+
+  const [data, preloadedComments] = await Promise.all([
+    await fetchQuery(api.posts.getById, { postId: postId }),
+    await preloadQuery(api.comments.getCommentsByPost, {
+      postingId: postId,
+    }),
+  ]);
 
   if (!data) return <h1 className="text-6xl font-bold">No post found!</h1>;
 
@@ -46,7 +52,7 @@ const PostIdPage = async ({ params }: PostIdProps) => {
       </div>
       <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">{data.body}</p>
       <Separator className="my-8" />
-      <CommentSection />
+      <CommentSection preloadedComments={preloadedComments} />
     </div>
   );
 };
