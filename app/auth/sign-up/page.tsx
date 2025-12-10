@@ -31,6 +31,7 @@ import z from 'zod';
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -42,8 +43,6 @@ export default function SignUp() {
   });
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
-    const router = useRouter();
-
     setIsLoading(true);
     await authClient.signUp
       .email({

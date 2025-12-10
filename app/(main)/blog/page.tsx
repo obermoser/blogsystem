@@ -4,12 +4,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { api } from '@/convex/_generated/api';
 import { fetchQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const dynamic = 'force-static';
 export const revalidate = 30;
+
+export const metadata: Metadata = {
+  title: 'Blog | nextJS 16 Tutorial',
+  description: 'Read our latest articles and insights',
+  category: 'Web Development',
+  authors: [{ name: 'Bernhard Obermoser' }],
+};
+
 export default async function Blog() {
   return (
     <div className="py-12">

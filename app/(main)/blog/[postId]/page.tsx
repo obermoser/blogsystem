@@ -1,11 +1,14 @@
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CommentSection } from '@/components/web/comment-section';
+import PostPresence from '@/components/web/post-presence';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { getToken } from '@/lib/auth-server';
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,14 +16,33 @@ interface PostIdProps {
   params: Promise<{ postId: Id<'posts'> }>;
 }
 
+export async function generateMetadata({ params }: PostIdProps): Promise<Metadata> {
+  const { postId } = await params;
+
+  const post = await fetchQuery(api.posts.getById, { postId: postId });
+  if (!post) {
+    return {
+      title: 'Post not found',
+    };
+  }
+  return {
+    title: post.title,
+    description: post.body?.slice(0, 30),
+    authors: [{ name: post.authorId }],
+  };
+}
+
 const PostIdPage = async ({ params }: PostIdProps) => {
   const { postId } = await params;
 
-  const [data, preloadedComments] = await Promise.all([
+  const token = await getToken();
+
+  const [data, preloadedComments, userId] = await Promise.all([
     await fetchQuery(api.posts.getById, { postId: postId }),
     await preloadQuery(api.comments.getCommentsByPost, {
       postingId: postId,
     }),
+    await fetchQuery(api.presence.getUserId, {}, { token }),
   ]);
 
   if (!data) return <h1 className="text-6xl font-bold">No post found!</h1>;
@@ -45,9 +67,12 @@ const PostIdPage = async ({ params }: PostIdProps) => {
       </div>
       <div className="space-y-4 flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-foreground">{data.title}</h1>
-        <p className="text-sm text-muted-foreground">
-          Posted: {formatDistanceToNow(new Date(data._creationTime!), { addSuffix: true })}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            Posted: {formatDistanceToNow(new Date(data._creationTime!), { addSuffix: true })}
+          </p>
+          {userId && <PostPresence roomId={postId} userId={userId as string} />}
+        </div>
         <Separator className="my-8" />
       </div>
       <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">{data.body}</p>
