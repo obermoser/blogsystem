@@ -6,11 +6,28 @@ import { Id } from '@/convex/_generated/dataModel';
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface PostIdProps {
   params: Promise<{ postId: Id<'posts'> }>;
+}
+
+export async function generateMetadata({ params }: PostIdProps): Promise<Metadata> {
+  const { postId } = await params;
+
+  const post = await fetchQuery(api.posts.getById, { postId: postId });
+  if (!post) {
+    return {
+      title: 'Post not found',
+    };
+  }
+  return {
+    title: post.title,
+    description: post.body?.slice(0, 30),
+    authors: [{ name: post.authorId }],
+  };
 }
 
 const PostIdPage = async ({ params }: PostIdProps) => {
