@@ -1,8 +1,10 @@
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CommentSection } from '@/components/web/comment-section';
+import PostPresence from '@/components/web/post-presence';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { getToken } from '@/lib/auth-server';
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
@@ -33,11 +35,14 @@ export async function generateMetadata({ params }: PostIdProps): Promise<Metadat
 const PostIdPage = async ({ params }: PostIdProps) => {
   const { postId } = await params;
 
-  const [data, preloadedComments] = await Promise.all([
+  const token = await getToken();
+
+  const [data, preloadedComments, userId] = await Promise.all([
     await fetchQuery(api.posts.getById, { postId: postId }),
     await preloadQuery(api.comments.getCommentsByPost, {
       postingId: postId,
     }),
+    await fetchQuery(api.presence.getUserId, {}, { token }),
   ]);
 
   if (!data) return <h1 className="text-6xl font-bold">No post found!</h1>;
@@ -62,9 +67,12 @@ const PostIdPage = async ({ params }: PostIdProps) => {
       </div>
       <div className="space-y-4 flex flex-col">
         <h1 className="text-4xl font-bold tracking-tight text-foreground">{data.title}</h1>
-        <p className="text-sm text-muted-foreground">
-          Posted: {formatDistanceToNow(new Date(data._creationTime!), { addSuffix: true })}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            Posted: {formatDistanceToNow(new Date(data._creationTime!), { addSuffix: true })}
+          </p>
+          {userId && <PostPresence roomId={postId} userId={userId as string} />}
+        </div>
         <Separator className="my-8" />
       </div>
       <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">{data.body}</p>

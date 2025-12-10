@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const dynamic = 'force-static';
-export const revalidate = 120;
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: 'Blog | nextJS 16 Tutorial',
