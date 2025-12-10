@@ -16,7 +16,6 @@ interface PostIdProps {
 const PostIdPage = async ({ params }: PostIdProps) => {
   const { postId } = await params;
   const data = await fetchQuery(api.posts.getById, { postId: postId });
-  const comments = await fetchQuery(api.comments.getCommentsByPost, { postingId: postId });
 
   if (!data) return <h1 className="text-6xl font-bold">No post found!</h1>;
 
