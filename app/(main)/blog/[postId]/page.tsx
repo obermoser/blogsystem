@@ -1,5 +1,6 @@
 import { buttonVariants } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { CommentSection } from '@/components/web/comment-section';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { fetchQuery } from 'convex/nextjs';
@@ -46,7 +47,7 @@ const PostIdPage = async ({ params }: PostIdProps) => {
       </div>
       <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">{data.body}</p>
       <Separator className="my-8" />
-      <pre>{JSON.stringify(comments, null, 2)}</pre>
+      <CommentSection />
     </div>
   );
 };
