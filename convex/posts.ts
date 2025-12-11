@@ -1,4 +1,5 @@
 import { ConvexError, v } from 'convex/values';
+import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 
 export const getById = query({
@@ -56,5 +57,51 @@ export const generateImageUploadUrl = mutation({
     if (!userId) throw new ConvexError('UNAUTHORIZED!');
 
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+interface searchResultTypes {
+  _id: string;
+  title: string;
+  body: string;
+}
+
+export const searchPosts = query({
+  args: {
+    keyword: v.string(),
+    limit: v.number(),
+  },
+  handler: async (ctx, { keyword, limit }) => {
+    const results: Array<searchResultTypes> = [];
+    const seen = new Set();
+
+    const pushDocs = async (docs: Array<Doc<'posts'>>) => {
+      for (const doc of docs) {
+        if (seen.has(doc._id)) continue;
+        seen.add(doc._id);
+        results.push({
+          _id: doc._id,
+          title: doc.title,
+          body: doc.body,
+        });
+        if (results.length >= limit) break;
+      }
+    };
+
+    const titleMatches = await ctx.db
+      .query('posts')
+      .withSearchIndex('search_title', (q) => q.search('title', keyword))
+      .take(limit);
+
+    await pushDocs(titleMatches);
+    if (results.length < limit) {
+      const bodyMatches = await ctx.db
+        .query('posts')
+        .withSearchIndex('search_body', (q) => q.search('body', keyword))
+        .take(limit);
+      await pushDocs(bodyMatches);
+    }
+
+    return results;
   },
 });

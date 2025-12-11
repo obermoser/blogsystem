@@ -9,7 +9,10 @@ export default defineSchema({
     imageStorageId: v.optional(v.id('_storage')),
   })
     .index('by_authorId', ['authorId'])
-    .searchIndex('search_contents', {
+    .searchIndex('search_title', {
+      searchField: 'title',
+    })
+    .searchIndex('search_body', {
       searchField: 'body',
     }),
 
