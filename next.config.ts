@@ -2,10 +2,11 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  cacheComponents: true,
   experimental: {
     turbopackFileSystemCacheForDev: true,
     serverActions: {
-      bodySizeLimit: '14MB',
+      bodySizeLimit: '25MB',
     },
   },
   images: {

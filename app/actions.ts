@@ -3,7 +3,7 @@ import { fetchMutation } from 'convex/nextjs';
 
 import { api } from '@/convex/_generated/api';
 import { getToken } from '@/lib/auth-server';
-import { revalidatePath } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import z from 'zod';
 import { postSchema } from './schemas/blog';
@@ -41,7 +41,7 @@ export async function createPostAction(data: z.infer<typeof postSchema>) {
       error: 'Failed to create upload url',
     };
   }
-  revalidatePath('/blog');
+  updateTag('blog');
 
-  redirect('/');
+  redirect('/blog');
 }

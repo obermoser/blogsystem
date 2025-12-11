@@ -5,13 +5,13 @@ import { api } from '@/convex/_generated/api';
 import { fetchQuery } from 'convex/nextjs';
 import { formatDistanceToNow } from 'date-fns';
 import { Metadata } from 'next';
+import { cacheLife, cacheTag } from 'next/cache';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
-export const dynamic = 'force-static';
+/* export const dynamic = 'force-static';
 export const revalidate = 30;
-
+ */
 export const metadata: Metadata = {
   title: 'Blog | nextJS 16 Tutorial',
   description: 'Read our latest articles and insights',
@@ -28,14 +28,17 @@ export default async function Blog() {
           Insights, thoughts and trends from our team!
         </p>
       </div>
-      <Suspense fallback={<BlogListSkeleton />}>
-        <LoadBLogList />
-      </Suspense>
+      {/* <Suspense fallback={<BlogListSkeleton />}> */}
+      <LoadBLogList />
+      {/* </Suspense> */}
     </div>
   );
 }
 
 async function LoadBLogList() {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('blog');
   const data = await fetchQuery(api.posts.get);
 
   return (
