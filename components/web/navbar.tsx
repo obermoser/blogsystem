@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { ModeToggle } from './mode-toggle';
+import SearchBar from './searchbar';
 
 export function Navbar() {
   const { isAuthenticated, isLoading } = useConvexAuth();
@@ -32,6 +33,9 @@ export function Navbar() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <div className="hidden md:block mr-2">
+          <SearchBar />
+        </div>
         {isLoading ? (
           <Loader2 className="animate-spin" />
         ) : isAuthenticated ? (
