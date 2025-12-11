@@ -27,7 +27,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="relative w-full max-w-sm">
+    <div className="relative w-full max-w-sm z-10">
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
         <Input
@@ -42,20 +42,33 @@ const SearchBar = () => {
       {open && keyword.length >= 2 && (
         <div className="absolute top-full mt-2 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95">
           {results === undefined ? (
-            <div>
-              <Loader2 />
+            <div className="flex items-center justify-center p-4 text-sm text-muted-foreground">
+              <Loader2 className="my-2 size-4 animate-spin" />
               Searching...
             </div>
           ) : results.length === 0 ? (
-            <p>No results found!</p>
+            <p className="p-4 text-muted-foreground text-sm text-center">No results found!</p>
           ) : (
-            <div className="py-1">
+            <>
               {results?.map((result) => (
-                <Link key={result._id} href={`/blog/${result._id}`} prefetch>
-                  <p>{result.title}</p>
-                </Link>
+                <div
+                  key={result._id}
+                  className="flex flex-col px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                >
+                  <Link
+                    href={`/blog/${result._id}`}
+                    onClick={() => {
+                      setOpen(false);
+                      setKeyword('');
+                    }}
+                    prefetch
+                  >
+                    <p className="font-medium truncate pt-1">{result.title}</p>
+                    <p className="text-xs text-muted-foreground">{result.body.substring(0, 60)}</p>
+                  </Link>
+                </div>
               ))}
-            </div>
+            </>
           )}
         </div>
       )}
